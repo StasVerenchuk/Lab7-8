@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Course App</title>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h2>Усі курси</h2>
+    <ul id="courses"></ul>
+
+    <h2>Пошук курсу за ID</h2>
+    <input type="text" id="courseId" size="5" placeholder="ID" />
+    <input type="button" value="Знайти" onclick="findCourse();" />
+    <p id="course"></p>
+
+    <script>
+        const uri = "/api/course";
+
+        $(document).ready(function () {
+            $.getJSON(uri)
+                .done(function (data) {
+                    $.each(data, function (key, item) {
+                        $("<li>", { text: formatCourse(item) }).appendTo("#courses");
+                    });
+                });
+        });
+
+        function formatCourse(course) {
+            return `${course.title} – $${course.price} (Початок: ${new Date(course.startDate).toLocaleDateString()})`;
+        }
+
+        function findCourse() {
+            const id = $("#courseId").val();
+            $.getJSON(`${uri}/${id}`)
+                .done(function (data) {
+                    $("#course").text(formatCourse(data));
+                })
+                .fail(function (jqXHR, textStatus, err) {
+                    $("#course").text("Помилка: " + err);
+                });
+        }
+    </script>
+</body>
+</html>
